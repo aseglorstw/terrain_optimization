@@ -1,9 +1,11 @@
 import argparse
 import os
 import sys
+import torch
 from pytorch3d.io import load_obj, save_obj
 from pytorch3d.structures import Meshes
-import torch
+from visualizer import visualize_mesh_matplotlib
+from visualizer import visualize_mesh_open3d
 
 # CUDA is a library in C that allows to write parallel programs at GPUs of NVIDIA.
 
@@ -27,6 +29,10 @@ def is_device_GPU(device):
     return device.type == 'cuda'
 
 
+def move_data_to_VRAM(vertices, faces, device):
+    return vertices.to(device), faces.verts_idx.to(device)
+
+
 def normalize_mesh(vertices):
     return (vertices - vertices.mean(0)) / max(vertices.abs().max(0)[0])
 
@@ -39,14 +45,12 @@ def create_mesh_object(path_to_obj_file, device):
     return Meshes(verts=[vertices], faces=[faces])
 
 
-def move_data_to_VRAM(vertices, faces, device):
-    return vertices.to(device), faces.verts_idx.to(device)
-
-
 def main(arguments):
     check_input(arguments.mesh_path)
     device = choose_device()
     mesh = create_mesh_object(arguments.mesh_path, device)
+    visualize_mesh_matplotlib(mesh)
+    visualize_mesh_open3d(mesh)
 
 
 if __name__ == '__main__':
