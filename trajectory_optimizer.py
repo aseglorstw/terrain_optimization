@@ -1,13 +1,14 @@
 import argparse
 import os
 import sys
+import numpy as np
+from noise import pnoise2
 import torch
 from pytorch3d.io import load_obj, save_obj
 from pytorch3d.structures import Meshes
 from visualizer import visualize_mesh_matplotlib
 from visualizer import visualize_mesh_open3d
-
-# CUDA is a library in C that allows to write parallel programs at GPUs of NVIDIA.
+from visualizer import visualize_height_map_mayavi
 
 
 def check_input(path_to_mesh):
@@ -45,12 +46,30 @@ def create_mesh_object(path_to_obj_file, device):
     return Meshes(verts=[vertices], faces=[faces])
 
 
+def generate_height_map(width, height, scale, octaves, persistence, lacunarity):
+    height_map = np.zeros((height, width))
+    for y in range(height):
+        for x in range(width):
+            height_map[y][x] = pnoise2(x / scale,
+                                       y / scale,
+                                       octaves=octaves,
+                                       persistence=persistence,
+                                       lacunarity=lacunarity,
+                                       repeatx=1024,
+                                       repeaty=1024,
+                                       base=42)
+    height_map -= height_map.min()
+    height_map /= height_map.max()
+    height_map *= 50
+    return height_map
+
+
 def main(arguments):
     check_input(arguments.mesh_path)
     device = choose_device()
     mesh = create_mesh_object(arguments.mesh_path, device)
-    visualize_mesh_matplotlib(mesh)
-    visualize_mesh_open3d(mesh)
+    height_map = generate_height_map(100, 100, 10, 6, 0.5, 2.0)
+    visualize_height_map_mayavi(height_map)
 
 
 if __name__ == '__main__':

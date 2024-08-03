@@ -3,6 +3,8 @@ from pytorch3d.ops import sample_points_from_meshes
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import open3d as o3d
+from noise import pnoise2
+from mayavi import mlab
 mpl.rcParams['savefig.dpi'] = 80
 mpl.rcParams['figure.dpi'] = 80
 
@@ -46,3 +48,14 @@ def visualize_mesh_open3d(mesh):
     colors[:, :] = [1, 0, 0]
     open3d_mesh.vertex_colors = o3d.utility.Vector3dVector(colors)
     o3d.visualization.draw_geometries([open3d_mesh])
+
+
+def visualize_height_map_mayavi(height_map):
+    mlab.figure(size=(800, 600), bgcolor=(0.16, 0.28, 0.46))
+    mlab.surf(height_map, colormap='terrain', warp_scale='auto')
+    mlab.colorbar(title='Height', orientation='vertical')
+    mlab.axes(xlabel='X', ylabel='Y', zlabel='Height')
+    mlab.title('3D Height Map Visualization with Mayavi')
+    mlab.view(azimuth=45, elevation=45, distance=600)
+    mlab.show()
+
