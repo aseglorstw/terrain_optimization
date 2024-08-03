@@ -46,30 +46,30 @@ def create_mesh_object(path_to_obj_file, device):
     return Meshes(verts=[vertices], faces=[faces])
 
 
-def generate_height_map(width, height, scale, octaves, persistence, lacunarity):
-    height_map = np.zeros((height, width))
-    for y in range(height):
-        for x in range(width):
-            height_map[y][x] = pnoise2(x / scale,
-                                       y / scale,
-                                       octaves=octaves,
-                                       persistence=persistence,
-                                       lacunarity=lacunarity,
-                                       repeatx=1024,
-                                       repeaty=1024,
-                                       base=42)
-    height_map -= height_map.min()
-    height_map /= height_map.max()
-    height_map *= 50
+def generate_init_height_map(width, height):
+    height_map = np.full((height, width), 0)
+    height_map[0][0] = 10
     return height_map
+
+
+def create_cuboid_points(center, size, resolution=10):
+    cx, cy, cz = center
+    sx, sy, sz = size
+    x = np.linspace(cx - sx / 2, cx + sx / 2, resolution)
+    y = np.linspace(cy - sy / 2, cy + sy / 2, resolution)
+    z = np.linspace(cz - sz / 2, cz + sz / 2, resolution)
+    X, Y, Z = np.meshgrid(x, y, z)
+    points = np.vstack([X.ravel(), Y.ravel(), Z.ravel()]).T
+    return points
 
 
 def main(arguments):
     check_input(arguments.mesh_path)
     device = choose_device()
     mesh = create_mesh_object(arguments.mesh_path, device)
-    height_map = generate_height_map(100, 100, 10, 6, 0.5, 2.0)
-    visualize_height_map_mayavi(height_map)
+    cuboid_points = create_cuboid_points((5, 5, 5), (2, 2, 2))
+    height_map = generate_init_height_map(10, 10)
+    visualize_height_map_mayavi(height_map, cuboid_points)
 
 
 if __name__ == '__main__':

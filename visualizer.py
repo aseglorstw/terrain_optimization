@@ -50,12 +50,13 @@ def visualize_mesh_open3d(mesh):
     o3d.visualization.draw_geometries([open3d_mesh])
 
 
-def visualize_height_map_mayavi(height_map):
+def visualize_height_map_mayavi(height_map, cuboid_points):
     mlab.figure(size=(800, 600), bgcolor=(0.16, 0.28, 0.46))
     mlab.surf(height_map, colormap='terrain', warp_scale='auto')
     mlab.colorbar(title='Height', orientation='vertical')
     mlab.axes(xlabel='X', ylabel='Y', zlabel='Height')
     mlab.title('3D Height Map Visualization with Mayavi')
     mlab.view(azimuth=45, elevation=45, distance=600)
+    mlab.points3d(cuboid_points[:, 0], cuboid_points[:, 1], cuboid_points[:, 2], scale_factor=0.1, color=(1, 0, 0))
     mlab.show()
 
