@@ -52,22 +52,44 @@ def generate_init_height_map(width, height):
     return height_map
 
 
-def create_cuboid_points(center, size, resolution=10):
-    cx, cy, cz = center
-    sx, sy, sz = size
-    x = np.linspace(cx - sx / 2, cx + sx / 2, resolution)
-    y = np.linspace(cy - sy / 2, cy + sy / 2, resolution)
-    z = np.linspace(cz - sz / 2, cz + sz / 2, resolution)
-    X, Y, Z = np.meshgrid(x, y, z)
-    points = np.vstack([X.ravel(), Y.ravel(), Z.ravel()]).T
-    return points
+def create_cuboid_points():
+    points = np.array([[-1, -1, 10],
+                       [-0.7, -1, 10],
+                       [-1, -0.7, 10],
+                       [-0.7, -0.7, 10],
+                       [1, -1, 10],
+                       [0.7, -1, 10],
+                       [1, -0.7, 10],
+                       [0.7, -0.7, 10],
+                       [-1, 1, 10],
+                       [-0.7, 1, 10],
+                       [-1, 0.7, 10],
+                       [-0.7, 0.7, 10],
+                       [1, 1, 10],
+                       [0.7, 1, 10],
+                       [1, 0.7, 10],
+                       [0.7, 0.7, 10],
+                       [-0.85, -0.85, 10.5],
+                       [-0.85, -0.85, 11],
+                       [0.85, -0.85, 10.5],
+                       [0.85, -0.85, 11],
+                       [-0.85, 0.85, 10.5],
+                       [-0.85, 0.85, 11],
+                       [0.85, 0.85, 10.5],
+                       [0.85, 0.85, 11]
+                       ])
+    roof_points = []
+    for x in np.linspace(-1, 1, 10):
+        for y in np.linspace(-1, 1, 10):
+            roof_points.append([x, y, 11])
+    return np.vstack([points, roof_points])
 
 
 def main(arguments):
     check_input(arguments.mesh_path)
     device = choose_device()
-    mesh = create_mesh_object(arguments.mesh_path, device)
-    cuboid_points = create_cuboid_points((5, 5, 5), (2, 2, 2))
+    # mesh = create_mesh_object(arguments.mesh_path, device)
+    cuboid_points = create_cuboid_points()
     height_map = generate_init_height_map(10, 10)
     visualize_height_map_mayavi(height_map, cuboid_points)
 

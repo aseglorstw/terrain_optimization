@@ -3,7 +3,6 @@ from pytorch3d.ops import sample_points_from_meshes
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import open3d as o3d
-from noise import pnoise2
 from mayavi import mlab
 mpl.rcParams['savefig.dpi'] = 80
 mpl.rcParams['figure.dpi'] = 80
@@ -55,8 +54,7 @@ def visualize_height_map_mayavi(height_map, cuboid_points):
     mlab.surf(height_map, colormap='terrain', warp_scale='auto')
     mlab.colorbar(title='Height', orientation='vertical')
     mlab.axes(xlabel='X', ylabel='Y', zlabel='Height')
-    mlab.title('3D Height Map Visualization with Mayavi')
     mlab.view(azimuth=45, elevation=45, distance=600)
-    mlab.points3d(cuboid_points[:, 0], cuboid_points[:, 1], cuboid_points[:, 2], scale_factor=0.1, color=(1, 0, 0))
+    mlab.points3d(cuboid_points[:, 0], cuboid_points[:, 1], cuboid_points[:, 2], scale_factor=0.3, color=(1, 0, 0))
     mlab.show()
 
