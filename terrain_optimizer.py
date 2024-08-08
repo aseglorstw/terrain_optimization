@@ -23,11 +23,11 @@ def optimization_process(robot_point_cloud, init_terrain_mesh, device):
     deform_vertices = torch.full(init_terrain_mesh.verts_packed().shape, 0.0, device=device, requires_grad=True)
     optimizer = torch.optim.SGD([deform_vertices], lr=1.0, momentum=0.9)
     terrain_mesh = None
-    for i in tqdm(range(10000), ncols=80, ascii=True, desc='Optimization'):
+    for i in tqdm(range(50), ncols=80, ascii=True, desc='Optimization'):
         optimizer.zero_grad()
         terrain_mesh = init_terrain_mesh.offset_verts(deform_vertices)
-        loss_distance_wheels = 0.05 * point_mesh_face_distance(terrain_mesh, robot_point_cloud)
-        loss_distance_roof = 0.05 * point_mesh_face_distance(terrain_mesh, robot_point_cloud)
+        loss_distance_wheels = point_mesh_face_distance(terrain_mesh, robot_point_cloud)
+        # loss_distance_roof = 0.05 * point_mesh_face_distance(terrain_mesh, robot_point_cloud)
         loss_laplacian = mesh_laplacian_smoothing(terrain_mesh, method="uniform")
         loss_normal = mesh_normal_consistency(terrain_mesh)
         loss_edge = mesh_edge_loss(terrain_mesh)

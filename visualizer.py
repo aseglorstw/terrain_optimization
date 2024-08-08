@@ -70,7 +70,8 @@ def visualize_mesh_open3d_with_points(mesh, robot_point_cloud):
     colors = np.ones((vertices_cpu.shape[0], 3))
     colors[:, :] = [0, 1, 0]
     open3d_mesh.vertex_colors = o3d.utility.Vector3dVector(colors)
-
+    open3d_mesh.compute_vertex_normals()
+    open3d_mesh = open3d_mesh.subdivide_loop(number_of_iterations=2)
 
     robot_point_cloud = robot_point_cloud.points_packed().cpu().numpy()
     point_cloud = o3d.geometry.PointCloud()
