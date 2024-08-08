@@ -2,9 +2,7 @@ import argparse
 import os
 import sys
 import torch
-from pytorch3d.structures import Meshes
 from pytorch3d.loss import point_mesh_face_distance
-from pytorch3d.structures import Pointclouds
 from pytorch3d.loss import (
     mesh_laplacian_smoothing,
     mesh_normal_consistency,
@@ -20,13 +18,8 @@ def check_input(path_to_mesh):
 
 
 def optimization_process(robot_point_cloud, terrain_mesh, device):
-    if len(terrain_mesh.verts_packed().shape) == 2:
-        terrain_mesh = Meshes(verts=[terrain_mesh.verts_packed()], faces=[terrain_mesh.faces_packed()])
-    if len(robot_point_cloud.shape) == 2:
-        robot_point_cloud = Pointclouds(points=[robot_point_cloud])
     deform_vertices = torch.full(terrain_mesh.verts_packed().shape, 0.0, device=device, requires_grad=True)
     optimizer = torch.optim.SGD([deform_vertices], lr=1.0, momentum=0.9)
-    loop = tqdm(range(20000))
     new_src_mesh = None
     for i in tqdm(range(1000), ncols=80, ascii=True, desc='Total'):
         optimizer.zero_grad()
