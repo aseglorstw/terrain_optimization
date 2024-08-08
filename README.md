@@ -1,1 +1,1 @@
-# robot_trajectory_optimization
+# terrain_optimization
