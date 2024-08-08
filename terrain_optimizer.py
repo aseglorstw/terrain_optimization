@@ -43,8 +43,8 @@ def optimization_process(wheels_point_cloud, roof_point_cloud, init_terrain_mesh
 def main(arguments):
     check_input(arguments.mesh_path)
     device = device_processer.choose_device()
-    wheels_point_cloud = point_cloud_processer.load_point_cloud(device, "point_clouds/test_robot_without_roof.npy")
-    roof_point_cloud = point_cloud_processer.load_point_cloud(device, "point_clouds/test_robot_roof.npy", [25, 25, 6])
+    wheels_point_cloud = point_cloud_processer.load_point_cloud(device, "point_clouds/test_robot_without_roof.npy", [25, 25, 5], None)
+    roof_point_cloud = point_cloud_processer.load_point_cloud(device, "point_clouds/test_robot_roof.npy", [25, 25, 6], None)
     init_height_map = heigh_map_processer.generate_init_height_map(50, 50)
     init_mesh_height_map = heigh_map_processer.height_map_to_mesh(init_height_map, device)
     optimization_process(wheels_point_cloud, roof_point_cloud, init_mesh_height_map, device)
