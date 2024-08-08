@@ -2,12 +2,9 @@ import argparse
 import os
 import sys
 import numpy as np
-from noise import pnoise2
 import torch
-from pytorch3d.io import load_obj, save_obj
+from pytorch3d.io import load_obj
 from pytorch3d.structures import Meshes
-from visualizer import visualize_mesh_matplotlib
-from visualizer import visualize_mesh_open3d
 from visualizer import visualize_height_map_mayavi
 
 
@@ -47,51 +44,21 @@ def create_mesh_object(path_to_obj_file, device):
 
 
 def generate_init_height_map(width, height):
-    height_map = np.full((height, width), 0)
-    height_map[0][0] = 10
-    return height_map
+    return np.full((height, width), 0)
 
 
-def create_cuboid_points():
-    points = np.array([[-1, -1, 10],
-                       [-0.7, -1, 10],
-                       [-1, -0.7, 10],
-                       [-0.7, -0.7, 10],
-                       [1, -1, 10],
-                       [0.7, -1, 10],
-                       [1, -0.7, 10],
-                       [0.7, -0.7, 10],
-                       [-1, 1, 10],
-                       [-0.7, 1, 10],
-                       [-1, 0.7, 10],
-                       [-0.7, 0.7, 10],
-                       [1, 1, 10],
-                       [0.7, 1, 10],
-                       [1, 0.7, 10],
-                       [0.7, 0.7, 10],
-                       [-0.85, -0.85, 10.5],
-                       [-0.85, -0.85, 11],
-                       [0.85, -0.85, 10.5],
-                       [0.85, -0.85, 11],
-                       [-0.85, 0.85, 10.5],
-                       [-0.85, 0.85, 11],
-                       [0.85, 0.85, 10.5],
-                       [0.85, 0.85, 11]
-                       ])
-    roof_points = []
-    for x in np.linspace(-1, 1, 10):
-        for y in np.linspace(-1, 1, 10):
-            roof_points.append([x, y, 11])
-    return np.vstack([points, roof_points])
+def load_point_cloud():
+    return np.load('point_clouds/cuboid_points.npy')
 
 
 def main(arguments):
     check_input(arguments.mesh_path)
     device = choose_device()
     # mesh = create_mesh_object(arguments.mesh_path, device)
-    cuboid_points = create_cuboid_points()
+    cuboid_points = load_point_cloud()
     height_map = generate_init_height_map(10, 10)
     visualize_height_map_mayavi(height_map, cuboid_points)
+
 
 
 if __name__ == '__main__':
