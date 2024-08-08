@@ -1,3 +1,5 @@
+import numpy as np
+import torch
 
 
 def load_point_cloud(device, desired_center=np.array([5, 5, 5])):

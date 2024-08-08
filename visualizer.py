@@ -69,10 +69,7 @@ def visualize_mesh_open3d_with_points(mesh, robot_point_cloud):
     colors = np.ones((vertices_cpu.shape[0], 3))
     colors[:, :] = [0, 1, 0]
     open3d_mesh.vertex_colors = o3d.utility.Vector3dVector(colors)
-    if isinstance(robot_point_cloud, Pointclouds):
-        robot_point_cloud = robot_point_cloud.points_packed().cpu().numpy()
-    if not isinstance(robot_point_cloud, np.ndarray):
-        raise TypeError("cuboid_points must be a NumPy array.")
+    robot_point_cloud = robot_point_cloud.points_packed().cpu().numpy()
     point_cloud = o3d.geometry.PointCloud()
     point_cloud.points = o3d.utility.Vector3dVector(robot_point_cloud)
     point_cloud.paint_uniform_color([1, 0, 0])

@@ -1,10 +1,11 @@
 from pytorch3d.io import load_obj
 from pytorch3d.structures import Meshes
+import device_processer
 
 
 def create_mesh_object(path_to_obj_file, device):
     vertices, faces, aux = load_obj(path_to_obj_file)
-    if is_device_GPU(device):
+    if device_processer.is_device_GPU(device):
         vertices, faces = move_mesh_to_VRAM(vertices, faces, device)
     vertices = normalize_mesh(vertices)
     return Meshes(verts=[vertices], faces=[faces])
