@@ -2,6 +2,8 @@ import numpy as np
 import torch
 from pytorch3d.structures import Pointclouds
 
+import visualizer
+
 
 def load_point_cloud(device, path_to_point_cloud, translation_vector, rotation_matrix):
     point_cloud = np.load(path_to_point_cloud)
@@ -10,8 +12,10 @@ def load_point_cloud(device, path_to_point_cloud, translation_vector, rotation_m
 
 
 def transform_point_cloud(point_cloud, translation_vector, rotation_matrix):
-    translated_point_cloud = point_cloud - np.mean(point_cloud, axis=0) + translation_vector
-    return translated_point_cloud
+    centered_point_cloud = point_cloud - np.mean(point_cloud, axis=0) + translation_vector
+    rotated_point_cloud = rotation_matrix @ centered_point_cloud.T
+    transformed_point_cloud = rotated_point_cloud.T
+    return transformed_point_cloud
 
 
 def move_point_cloud_to_VRAM(point_cloud, device):

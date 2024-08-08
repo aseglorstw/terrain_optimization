@@ -38,6 +38,17 @@ def visualize_mesh_matplotlib(mesh):
     plt.show()
 
 
+def visualize_point_cloud_matplotlib(point_cloud):
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.scatter(point_cloud[:, 0], point_cloud[:, 1], point_cloud[:, 2], c='r', marker='o')
+    ax.set_xlabel('X Label')
+    ax.set_ylabel('Y Label')
+    ax.set_zlabel('Z Label')
+    ax.set_title('Point Cloud Visualization')
+    plt.show()
+
+
 def visualize_mesh_open3d(mesh):
     vertices_cpu = mesh.verts_packed().detach().cpu().numpy()
     faces_cpu = mesh.faces_packed().detach().cpu().numpy()
