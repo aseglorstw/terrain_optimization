@@ -24,8 +24,7 @@ def check_input(path_to_mesh):
 def optimization_process(wheels_point_cloud, roof_point_cloud, init_terrain_mesh, device):
     deform_vertices = torch.full(init_terrain_mesh.verts_packed().shape, 0.0, device=device, requires_grad=True)
     optimizer = torch.optim.SGD([deform_vertices], lr=1.0, momentum=0.9)
-    terrain_mesh = None
-    for i in tqdm(range(5000), ncols=80, ascii=True, desc='Optimization'):
+    for i in tqdm(range(500), ncols=80, ascii=True, desc='Optimization'):
         optimizer.zero_grad()
         terrain_mesh = init_terrain_mesh.offset_verts(deform_vertices)
         loss_face_distance_wheels = point_mesh_face_distance(terrain_mesh, wheels_point_cloud)
@@ -33,9 +32,8 @@ def optimization_process(wheels_point_cloud, roof_point_cloud, init_terrain_mesh
         loss_edge_distance_wheels = point_mesh_edge_distance(terrain_mesh, wheels_point_cloud)
         loss_edge_distance_roof = point_mesh_edge_distance(terrain_mesh, roof_point_cloud)
         loss_laplacian = mesh_laplacian_smoothing(terrain_mesh, method="uniform")
-        loss_normal = mesh_normal_consistency(terrain_mesh)
         loss_edge = mesh_edge_loss(terrain_mesh)
-        loss = 0.5 * (loss_face_distance_wheels + loss_edge_distance_wheels) + 0.5 * loss_laplacian + 1.5 * loss_edge + loss_normal - 0.001 * (loss_face_distance_roof + loss_edge_distance_roof)
+        loss = 0.75 * (loss_face_distance_wheels + loss_edge_distance_wheels) + 0.5 * loss_laplacian + 1.5 * loss_edge - 0.001 * (loss_face_distance_roof + loss_edge_distance_roof)
         loss.backward()
         optimizer.step()
         if i % 50 == 0 and i >= 200:
