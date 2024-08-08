@@ -58,3 +58,17 @@ def visualize_height_map_mayavi(height_map, cuboid_points):
     mlab.points3d(cuboid_points[:, 0], cuboid_points[:, 1], cuboid_points[:, 2], scale_factor=0.3, color=(1, 0, 0))
     mlab.show()
 
+
+def visualize_mesh_open3d_with_points(mesh, cuboid_points):
+    vertices_cpu = mesh.verts_packed().cpu()
+    faces_cpu = mesh.faces_packed().cpu()
+    open3d_mesh = o3d.geometry.TriangleMesh()
+    open3d_mesh.vertices = o3d.utility.Vector3dVector(vertices_cpu.numpy())
+    open3d_mesh.triangles = o3d.utility.Vector3iVector(faces_cpu.numpy())
+    colors = np.ones((vertices_cpu.numpy().shape[0], 3))
+    colors[:, :] = [0, 1, 0]
+    open3d_mesh.vertex_colors = o3d.utility.Vector3dVector(colors)
+    point_cloud = o3d.geometry.PointCloud()
+    point_cloud.points = o3d.utility.Vector3dVector(cuboid_points)
+    point_cloud.paint_uniform_color([1, 0, 0])
+    o3d.visualization.draw_geometries([open3d_mesh, point_cloud])
