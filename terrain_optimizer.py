@@ -11,8 +11,8 @@ from pytorch3d.loss import (
     mesh_edge_loss
 )
 from tqdm.auto import tqdm
-import device_processer, heigh_map_processer, point_cloud_processer, visualizer
-import mesh_processer
+import device_tools, height_map_tools, point_cloud_tools, visualize_tools
+import mesh_tools
 from pytorch3d.structures import Pointclouds
 
 
@@ -34,23 +34,24 @@ def optimization_process(wheels_point_cloud, roof_point_cloud, init_terrain_mesh
         loss_edge_distance_roof = point_mesh_edge_distance(terrain_mesh, roof_point_cloud)
         loss_laplacian = mesh_laplacian_smoothing(terrain_mesh, method="uniform")
         loss_edge = mesh_edge_loss(terrain_mesh)
-        loss = 0.75 * (loss_face_distance_wheels + loss_edge_distance_wheels) + 0.5 * loss_laplacian + 1.5 * loss_edge - 0.001 * (loss_face_distance_roof + loss_edge_distance_roof)
+        loss = 0.75 * (loss_face_distance_wheels + loss_edge_distance_wheels) + 0.5 * loss_laplacian + 1.5 * loss_edge
         loss.backward()
         optimizer.step()
-        if i % 50 == 0 and i >= 200:
+        if i % 50 == 0 :
             visualizer.visualize_mesh_open3d_with_points(terrain_mesh, point_cloud_processer.combine_point_clouds([wheels_point_cloud, roof_point_cloud]))
 
 
 def main(arguments):
     check_input(arguments.mesh_path)
     device = device_processer.choose_device()
+    angle = 0
     rotation_matrix = np.array([
-        [np.cos(-45), 0, np.sin(-45)],
+        [np.cos(angle), 0, np.sin(angle)],
         [0, 1, 0],
-        [-np.sin(-45), 0, np.cos(-45)]
+        [-np.sin(angle), 0, np.cos(angle)]
     ])
-    wheels_point_cloud = point_cloud_processer.load_point_cloud(device, "point_clouds/test_robot_without_roof.npy", [30, 30, 0], rotation_matrix)
-    roof_point_cloud = point_cloud_processer.load_point_cloud(device, "point_clouds/test_robot_roof.npy", [30, 30, 1], rotation_matrix)
+    wheels_point_cloud = point_cloud_processer.load_point_cloud(device, "point_clouds/test_robot.npy")
+    roof_point_cloud = point_cloud_processer.load_point_cloud(device, "point_clouds/test_robot_roof.npy")
     init_height_map = heigh_map_processer.generate_init_height_map(50, 50)
     init_mesh_height_map = heigh_map_processer.height_map_to_mesh(init_height_map, device)
     optimization_process(wheels_point_cloud, roof_point_cloud, init_mesh_height_map, device)
