@@ -19,6 +19,7 @@ def save_mesh(mesh):
                           faces=[torch.tensor(faces, dtype=torch.int64)])
     save_obj("experiments/second_experiment/terrain.obj", mesh_to_save.verts_packed(), mesh_to_save.faces_packed())
 
+
 def move_mesh_to_VRAM(vertices, faces, device):
     return vertices.to(device), faces.verts_idx.to(device)
 

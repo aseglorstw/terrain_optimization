@@ -37,11 +37,8 @@ def optimization_process(wheels_point_cloud, roof_point_cloud, init_terrain_mesh
         loss = 0.75 * (loss_face_distance_wheels + loss_edge_distance_wheels) + 0.5 * loss_laplacian + 1.5 * loss_edge - 0.001 * (loss_face_distance_roof + loss_edge_distance_roof)
         loss.backward()
         optimizer.step()
-        # if i % 50 == 0 and i >= 200:
-        #     visualizer.visualize_mesh_open3d_with_points(terrain_mesh, point_cloud_processer.combine_point_clouds([wheels_point_cloud, roof_point_cloud]))
-    mesh_processer.save_mesh(terrain_mesh)
-    visualizer.visualize_mesh_open3d_with_points(terrain_mesh, point_cloud_processer.combine_point_clouds(
-        [wheels_point_cloud, roof_point_cloud]))
+        if i % 50 == 0 and i >= 200:
+            visualizer.visualize_mesh_open3d_with_points(terrain_mesh, point_cloud_processer.combine_point_clouds([wheels_point_cloud, roof_point_cloud]))
 
 
 def main(arguments):
