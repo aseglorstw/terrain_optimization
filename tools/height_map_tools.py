@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 from pytorch3d.structures import Meshes
+from tools import device_tools
 
 
 def generate_init_height_map(width, height):
@@ -28,7 +29,7 @@ def height_map_to_mesh(height_map, device):
             faces.append([v1, v4, v3])
     vertices = torch.tensor(vertices, dtype=torch.float32)
     faces = torch.tensor(faces, dtype=torch.int64)
-    if device_processer.is_device_GPU(device):
+    if device_tools.is_device_GPU(device):
         vertices, faces = move_mesh_to_VRAM(vertices, faces, device)
     mesh = Meshes(verts=[vertices], faces=[faces])
     return mesh

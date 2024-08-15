@@ -1,9 +1,10 @@
-import numpy as np
+import torch
+from pytorch3d.transforms import euler_angles_to_matrix, Transform3d
 
 
-def get_rotation_matrix(angle):
-    rotation_matrix = np.array([
-        [np.cos(angle), 0, np.sin(angle)],
-        [0, 1, 0],
-        [-np.sin(angle), 0, np.cos(angle)]
-    ])
+def get_transformation_matrix(rotation_tensor, translation_tensor):
+    rotation_matrix = euler_angles_to_matrix(rotation_tensor, convention="XYZ")
+    transformation_matrix = torch.eye(4)
+    transformation_matrix[:3, :3] = rotation_matrix
+    transformation_matrix[:3, 3] = translation_tensor
+    return transformation_matrix
