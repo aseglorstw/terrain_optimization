@@ -1,7 +1,7 @@
 import torch
 from pytorch3d.io import load_obj, save_obj
 from pytorch3d.structures import Meshes
-import device_tools
+from tools import device_tools
 
 
 def load_mesh(path_to_obj_file, device):

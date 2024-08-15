@@ -1,8 +1,6 @@
 import numpy as np
 import torch
 from pytorch3d.structures import Meshes
-import mesh_tools
-import device_tools
 
 
 def generate_init_height_map(width, height):

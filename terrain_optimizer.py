@@ -2,18 +2,14 @@ import argparse
 import os
 import sys
 import torch
-import numpy as np
 from pytorch3d.loss import (
     point_mesh_face_distance,
     point_mesh_edge_distance,
     mesh_laplacian_smoothing,
-    mesh_normal_consistency,
     mesh_edge_loss
 )
 from tqdm.auto import tqdm
-import device_tools, height_map_tools, point_cloud_tools, visualize_tools
-import mesh_tools
-from pytorch3d.structures import Pointclouds
+from tools import device_tools, height_map_tools, point_cloud_tools, visualize_tools
 
 
 def check_input(path_to_mesh):
