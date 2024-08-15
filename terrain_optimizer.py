@@ -1,6 +1,5 @@
 import argparse
-import os
-import sys
+import torch
 from tools import (
     device_tools,
     height_map_tools,
@@ -14,11 +13,14 @@ from tools import (
 def determine_touch_points(robot_model, robot_pose, terrain_shape):
     map_pose = terrain_shape.verts_packed().mean(0)
     robot_vertices = robot_model.verts_packed()
-
-    translated_vertices = robot_vertices + map_pose
-    new_robot_model = robot_model.update_padded(translated_vertices.unsqueeze(0))
-    visualize_tools.visualize_two_py_torch3d_meshes(terrain_shape, new_robot_model)
-    return new_robot_model
+    # print(robot_vertices[:, 2].min().item())
+    device = robot_vertices.device
+    num_verts = robot_vertices.shape[0]
+    homogeneous_robot_vertices = torch.cat([robot_vertices, torch.ones((num_verts, 1), device=device)], dim=1)
+    transformed_vertices = torch.matmul(robot_pose.to(device), homogeneous_robot_vertices.T).T
+    transformed_vertices = transformed_vertices[:, :3] + map_pose
+    new_robot_model = robot_model.update_padded(transformed_vertices.unsqueeze(0))
+    visualize_tools.visualize_two_py_torch3d_meshes(new_robot_model, terrain_shape)
 
 
 def main(arguments):
@@ -26,7 +28,7 @@ def main(arguments):
     init_height_map = height_map_tools.generate_init_height_map(50, 50)
     init_mesh_height_map = height_map_tools.height_map_to_mesh(init_height_map, device)
     robot_mesh = mesh_tools.load_mesh("../URDF2mesh/meshes_extracted/husky.obj", device)
-    robot_pose = math_tools.get_transformation_matrix([0, 0, 0], [0, 0, 0])
+    robot_pose = math_tools.get_transformation_matrix([0, 0, 0], [0, 0, 0.1449791043996811])
     determine_touch_points(robot_mesh, robot_pose, init_mesh_height_map)
 
 

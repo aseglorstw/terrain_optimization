@@ -24,4 +24,7 @@ def visualize_two_py_torch3d_meshes(mesh1, mesh2):
     plotter = pv.Plotter()
     plotter.add_mesh(mesh1_pv, show_edges=True)
     plotter.add_mesh(mesh2_pv, show_edges=True)
+    labels = dict(zlabel='z', xlabel='x', ylabel='y')
+    plotter.show_grid(**labels)
+    plotter.add_axes(**labels)
     plotter.show()
