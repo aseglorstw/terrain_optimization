@@ -8,7 +8,7 @@ def load_mesh(path_to_obj_file, device):
     vertices, faces, aux = load_obj(path_to_obj_file)
     if device_tools.is_device_GPU(device):
         vertices, faces = move_mesh_to_VRAM(vertices, faces, device)
-    # vertices = normalize_mesh(vertices)
+    vertices = normalize_mesh(vertices)
     return Meshes(verts=[vertices], faces=[faces])
 
 
