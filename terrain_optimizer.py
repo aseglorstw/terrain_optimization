@@ -11,15 +11,10 @@ from tools import (
 )
 
 
-def check_input(path_to_mesh):
-    if not os.path.isfile(path_to_mesh):
-        print(f"The file {path_to_mesh} does not exists")
-        sys.exit("Exiting the program due to missing file.")
-
-
 def determine_touch_points(robot_model, robot_pose, terrain_shape):
     map_pose = terrain_shape.verts_packed().mean(0)
     robot_vertices = robot_model.verts_packed()
+
     translated_vertices = robot_vertices + map_pose
     new_robot_model = robot_model.update_padded(translated_vertices.unsqueeze(0))
     visualize_tools.visualize_two_py_torch3d_meshes(terrain_shape, new_robot_model)
@@ -27,7 +22,6 @@ def determine_touch_points(robot_model, robot_pose, terrain_shape):
 
 
 def main(arguments):
-    check_input(arguments.mesh_path)
     device = device_tools.choose_device()
     init_height_map = height_map_tools.generate_init_height_map(50, 50)
     init_mesh_height_map = height_map_tools.height_map_to_mesh(init_height_map, device)
