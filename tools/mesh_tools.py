@@ -1,5 +1,6 @@
 import torch
 import pyvista as pv
+import numpy as np
 from pytorch3d.io import load_obj, save_obj
 from pytorch3d.structures import Meshes
 from tools import device_tools
@@ -20,6 +21,19 @@ def simplify_mesh_and_save(path_to_mesh, output_path, reduction):
     mesh = pv.read(path_to_mesh)
     simplified_mesh = mesh.decimate_pro(reduction)
     simplified_mesh.save(output_path)
+
+
+def generate_terrain_mesh_and_save(output_path):
+    nx, ny = 100, 100
+    x = np.linspace(0, 50, nx)
+    y = np.linspace(0, 50, ny)
+    x, y = np.meshgrid(x, y)
+    z = np.sin(x) * np.cos(y)
+    grid = pv.StructuredGrid(x, y, z)
+    poly_data = grid.extract_surface()
+    plotter = pv.Plotter()
+    plotter.add_mesh(poly_data, cmap="terrain", show_edges=True)
+    poly_data.save(output_path)
 
 
 def save_mesh(mesh, path_to_file):
