@@ -11,7 +11,7 @@ def determine_touch_points_meshlib(path_to_robot_mesh, terrain_mesh, output_path
     robot_mesh = mr.loadMesh(path_to_robot_mesh)
     terrain_mesh = mr.loadMesh(terrain_mesh)
     start = time.time()
-    intersection = mr.boolean(robot_mesh, terrain_mesh, mr.BooleanOperation.InsideA)
+    intersection = mr.boolean(robot_mesh, terrain_mesh, mr.BooleanOperation.InsideB)
     end = time.time()
     print(end - start)
     mr.saveMesh(intersection.mesh, output_path)
