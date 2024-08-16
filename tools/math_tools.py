@@ -5,7 +5,7 @@ from pytorch3d.transforms import euler_angles_to_matrix, Transform3d
 def transform_robot_model(robot_model, robot_pose, terrain_shape):
     map_pose = terrain_shape.verts_packed().mean(0)
     robot_vertices = robot_model.verts_packed()
-    print(robot_vertices[:, 2].min().item())
+    # print(robot_vertices[:, 2].min().item())
     device = robot_vertices.device
     num_verts = robot_vertices.shape[0]
     homogeneous_robot_vertices = torch.cat([robot_vertices, torch.ones((num_verts, 1), device=device)], dim=1)
