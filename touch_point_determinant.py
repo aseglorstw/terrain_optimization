@@ -27,7 +27,7 @@ def main():
     # transform_matrix = math_tools.get_transformation_matrix([0, 0, 0], [0, 0, 0.05])
     # transformed_robot = math_tools.transform_robot_model(robot_mesh, transform_matrix, terrain_mesh)
     # mesh_tools.save_mesh(transformed_robot, "/home/robert/catkin_ws/src/robot_touch_point_detection/transformed_robot_2.obj")
-    mesh_tools.simplify_mesh_and_save("/home/robert/catkin_ws/src/robot_touch_point_detection/experiments/experiment_2/terrain_mesh.obj", "/home/robert/catkin_ws/src/robot_touch_point_detection/experiments/experiment_3/terrain_mesh_simplified.stl", 0.99)
+    mesh_tools.simplify_mesh_and_save("/home/robert/catkin_ws/src/robot_touch_point_detection/experiments/experiment_2/terrain_mesh.obj", "/home/robert/catkin_ws/src/robot_touch_point_detection/experiments/experiment_3/terrain_mesh_simplified.stl", 0.1)
 
     #determine_touch_points_meshlib("/experiments/experiment_2/transformed_robot_2_simplified.stl", path_to_terrain_mesh, output_path)
 
