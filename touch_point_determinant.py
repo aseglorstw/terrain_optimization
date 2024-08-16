@@ -20,7 +20,7 @@ def main():
     output_path = "/home/robert/catkin_ws/src/robot_touch_point_detection/experiments/second_experiment/transformed_robot_simplified.stl"
     # determine_touch_points_meshlib()
     # mesh_tools.simplify_mesh_and_save(path_to_robot_mesh, output_path)
-    visualize_tools.visualize_two_meshes("/home/robert/catkin_ws/src/robot_touch_point_detection/experiments/second_experiment/transformed_robot_simplified.stl", "/home/robert/catkin_ws/src/robot_touch_point_detection/experiments/first_experiment/transformed_robot.stl")
+    visualize_tools.visualize_two_meshes("/home/robert/catkin_ws/src/robot_touch_point_detection/experiments/second_experiment/transformed_robot_simplified.stl", "/home/robert/catkin_ws/src/robot_touch_point_detection/experiments/first_experiment/terrain_mesh.stl")
 
 
 if __name__ == '__main__':
