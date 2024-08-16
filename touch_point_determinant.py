@@ -10,7 +10,7 @@ def determine_touch_points_meshlib(path_to_robot_mesh, terrain_mesh, output_path
     robot_mesh = mr.loadMesh(path_to_robot_mesh)
     terrain_mesh = mr.loadMesh(terrain_mesh)
     start = time.time()
-    intersection = mr.boolean(robot_mesh, terrain_mesh, mr.BooleanOperation.InsideA)
+    intersection = mr.boolean(robot_mesh, terrain_mesh, mr.BooleanOperation.Intersection)
     end = time.time()
     print(end - start)
     mr.saveMesh(intersection.mesh, output_path)
@@ -19,7 +19,7 @@ def determine_touch_points_meshlib(path_to_robot_mesh, terrain_mesh, output_path
 def main():
     path_to_robot_mesh = "/home/robert/catkin_ws/src/robot_touch_point_detection/experiments/experiment_3/transformed_robot_2_simplified_2.stl"
     path_to_terrain_mesh = "/home/robert/catkin_ws/src/robot_touch_point_detection/experiments/experiment_3/terrain_mesh.stl"
-    output_path = "/home/robert/catkin_ws/src/robot_touch_point_detection/experiments/experiment_3/meshlib/intersection.stl"
+    output_path = "/home/robert/catkin_ws/src/robot_touch_point_detection/experiments/experiment_3/meshlib/inside.obj"
     # determine_touch_points_meshlib(path_to_robot_mesh, path_to_terrain_mesh, output_path)
     # device = device_tools.choose_device()
     # robot_mesh = mesh_tools.load_mesh("/home/robert/catkin_ws/src/URDF2mesh/meshes_extracted/husky.obj", device)
@@ -30,8 +30,7 @@ def main():
     # mesh_tools.simplify_mesh_and_save("/home/robert/catkin_ws/src/robot_touch_point_detection/experiments/experiment_2/terrain_mesh.obj", "/home/robert/catkin_ws/src/robot_touch_point_detection/experiments/experiment_3/terrain_mesh_simplified.stl", 0.1)
 
     determine_touch_points_meshlib(path_to_robot_mesh, path_to_terrain_mesh, output_path)
-    # visualize_tools.visualize_two_meshes(path_to_terrain_mesh, path_to_robot_mesh)
-
+    # visualize_tools.visualize_two_meshes(path_to_terrain_mesh, output_path)
 
 
 if __name__ == '__main__':

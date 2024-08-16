@@ -33,6 +33,7 @@ def visualize_two_py_torch3d_meshes(mesh1, mesh2):
 
 
 def visualize_two_meshes(mesh1_path, mesh2_path):
+    pv.global_theme.allow_empty_mesh = True
     mesh1 = pv.read(mesh1_path)
     mesh2 = pv.read(mesh2_path)
     plotter = pv.Plotter()
