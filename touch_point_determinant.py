@@ -10,7 +10,7 @@ def determine_touch_points_meshlib(path_to_robot_mesh, terrain_mesh, output_path
     robot_mesh = mr.loadMesh(path_to_robot_mesh)
     terrain_mesh = mr.loadMesh(terrain_mesh)
     start = time.time()
-    intersection = mr.boolean(terrain_mesh, robot_mesh, mr.BooleanOperation.Intersection)
+    intersection = mr.boolean(robot_mesh, terrain_mesh, mr.BooleanOperation.InsideA)
     end = time.time()
     print(end - start)
     mr.saveMesh(intersection.mesh, output_path)
@@ -30,6 +30,7 @@ def main():
     # mesh_tools.simplify_mesh_and_save("/home/robert/catkin_ws/src/robot_touch_point_detection/experiments/experiment_2/terrain_mesh.obj", "/home/robert/catkin_ws/src/robot_touch_point_detection/experiments/experiment_3/terrain_mesh_simplified.stl", 0.1)
 
     determine_touch_points_meshlib(path_to_robot_mesh, path_to_terrain_mesh, output_path)
+    # visualize_tools.visualize_two_meshes(path_to_terrain_mesh, path_to_robot_mesh)
 
 
 
