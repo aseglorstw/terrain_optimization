@@ -16,9 +16,9 @@ def move_mesh_to_VRAM(vertices, faces, device):
     return vertices.to(device), faces.verts_idx.to(device)
 
 
-def simplify_mesh_and_save(path_to_mesh, output_path):
+def simplify_mesh_and_save(path_to_mesh, output_path, reduction):
     mesh = pv.read(path_to_mesh)
-    simplified_mesh = mesh.decimate_pro(0.9)
+    simplified_mesh = mesh.decimate_pro(reduction)
     simplified_mesh.save(output_path)
 
 
