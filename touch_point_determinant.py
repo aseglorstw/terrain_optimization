@@ -19,7 +19,7 @@ def determine_touch_points_meshlib(path_to_robot_mesh, terrain_mesh, output_path
 def main():
     # path_to_robot_mesh = "/home/robert/catkin_ws/src/robot_touch_point_detection/experiments/second_experiment/transformed_robot_simplified.stl"
     path_to_terrain_mesh = "/home/robert/catkin_ws/src/robot_touch_point_detection/experiments/second_experiment/terrain_mesh.obj"
-    # output_path = "/home/robert/catkin_ws/src/robot_touch_point_detection/experiments/second_experiment/meshlib/intersection.stl"
+    output_path = "/home/robert/catkin_ws/src/robot_touch_point_detection/experiments/second_experiment/meshlib/intersection.stl"
     # determine_touch_points_meshlib(path_to_robot_mesh, path_to_terrain_mesh, output_path)
     # device = device_tools.choose_device()
     # robot_mesh = mesh_tools.load_mesh("/home/robert/catkin_ws/src/URDF2mesh/meshes_extracted/husky.obj", device)
@@ -27,9 +27,9 @@ def main():
     # transform_matrix = math_tools.get_transformation_matrix([0, 0, 0], [0, 0, 0.05])
     # transformed_robot = math_tools.transform_robot_model(robot_mesh, transform_matrix, terrain_mesh)
     # mesh_tools.save_mesh(transformed_robot, "/home/robert/catkin_ws/src/robot_touch_point_detection/transformed_robot_2.obj")
-    mesh_tools.simplify_mesh_and_save("/home/robert/catkin_ws/src/robot_touch_point_detection/experiments/second_experiment/transformed_robot_2.obj", "/home/robert/catkin_ws/src/robot_touch_point_detection/experiments/second_experiment/transformed_robot_2_simplified.stl", 0.9)
+    # mesh_tools.simplify_mesh_and_save("/home/robert/catkin_ws/src/robot_touch_point_detection/experiments/second_experiment/transformed_robot_2.obj", "/home/robert/catkin_ws/src/robot_touch_point_detection/experiments/second_experiment/transformed_robot_2_simplified.stl", 0.9)
 
-
+    determine_touch_points_meshlib("/home/robert/catkin_ws/src/robot_touch_point_detection/experiments/second_experiment/transformed_robot_2_simplified.stl", path_to_terrain_mesh, output_path)
 
 
 
