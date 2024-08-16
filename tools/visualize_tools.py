@@ -39,3 +39,6 @@ def visualize_two_meshes(mesh1_path, mesh2_path):
     plotter.add_mesh(mesh1, show_edges=True, color="green")
     plotter.add_mesh(mesh2, show_edges=True, color="red")
     plotter.show()
+
+    mesh1.save(mesh1_path)
+    mesh2.save(mesh2_path)
