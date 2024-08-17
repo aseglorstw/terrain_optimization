@@ -9,9 +9,9 @@ from meshlib import mrmeshnumpy as mn
 import time
 
 
-def get_touch_points_meshlib_insideA_or_outsideB(path_to_robot_mesh, terrain_mesh, output_path):
+def get_touch_points_meshlib_insideA_or_outsideB(path_to_robot_mesh, path_to_terrain_mesh):
     robot_mesh = mr.loadMesh(path_to_robot_mesh)
-    terrain_mesh = mr.loadMesh(terrain_mesh)
+    terrain_mesh = mr.loadMesh(path_to_terrain_mesh)
     first_normal = terrain_mesh.normal(mr.FaceId())
     boolean_operation = mr.BooleanOperation.OutsideA if first_normal.z < 0 else mr.BooleanOperation.InsideA
     start = time.time()
@@ -24,6 +24,20 @@ def get_touch_points_meshlib_insideA_or_outsideB(path_to_robot_mesh, terrain_mes
     mesh = Meshes(verts=[vertices_tensor], faces=[faces_tensor])
     end = time.time()
     print(f"meshlib insideA: {(end - start) * 1000}  milliseconds")
+
+    faces_with_size = np.hstack([np.full((faces.shape[0], 1), 3), faces]).flatten()
+    pv_mesh = pv.PolyData(vertices, faces_with_size)
+    pv_mesh = pv_mesh.compute_normals()
+    nth = 100  # adjust this value to change the density of normals
+    subsampled_points = pv_mesh.extract_points(np.arange(0, pv_mesh.n_points, nth))
+    pv_robot = pv.read(path_to_robot_mesh)
+    pv_terrain = pv.read(path_to_terrain_mesh)
+    plotter = pv.Plotter()
+    plotter.add_mesh(pv_robot, style='wireframe', color='yellow')
+    plotter.add_mesh(pv_terrain, style='wireframe', color='purple')
+    plotter.add_mesh(pv_mesh, show_edges=True, color='red')
+    plotter.add_mesh(subsampled_points.glyph(orient='Normals', scale=False, factor=0.05), color='blue')
+    plotter.show()
 
 
 def get_touch_points_pyvista_intersection(path_to_robot_mesh, terrain_mesh):
@@ -84,8 +98,8 @@ def get_touch_point_pyvista_difference(path_to_robot_mesh, terrain_mesh):
 def main():
     path_to_robot_mesh = "/home/robert/catkin_ws/src/robot_touch_point_detection/robot_models/husky_transformed_45_angle/transformed_model_simplified.obj"
     path_to_terrain_mesh = "/home/robert/catkin_ws/src/robot_touch_point_detection/terrain_models/terrain_1/terrain_mesh.obj"
-    output_path = "/home/robert/catkin_ws/src/robot_touch_point_detection/result.obj"
-    get_touch_points_meshlib_insideA_or_outsideB(path_to_robot_mesh, path_to_terrain_mesh, output_path)
+    path_to_flat_mesh = "/home/robert/catkin_ws/src/robot_touch_point_detection/terrain_models/flat_terrain/terrain_mesh.obj"
+    get_touch_points_meshlib_insideA_or_outsideB(path_to_robot_mesh, path_to_terrain_mesh)
     # get_touch_points_pyvista_intersection(path_to_robot_mesh, path_to_terrain_mesh)
     # get_touch_points_pyvista_boolean_intersection(path_to_robot_mesh, path_to_terrain_mesh)
     # get_touch_points_pyvista_collision(path_to_robot_mesh, path_to_terrain_mesh)
