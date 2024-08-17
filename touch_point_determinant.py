@@ -27,7 +27,7 @@ def get_touch_points_meshlib_insideA_or_outsideB(path_to_robot_mesh, path_to_ter
 
     faces_with_size = np.hstack([np.full((faces.shape[0], 1), 3), faces]).flatten()
     pv_mesh = pv.PolyData(vertices, faces_with_size)
-    pv_mesh = pv_mesh.compute_normals()
+    pv_mesh = pv_mesh.compute_normals(flip_normals=True)
     nth = 100  # adjust this value to change the density of normals
     subsampled_points = pv_mesh.extract_points(np.arange(0, pv_mesh.n_points, nth))
     pv_robot = pv.read(path_to_robot_mesh)
