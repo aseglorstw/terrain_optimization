@@ -1,11 +1,20 @@
 import meshlib.mrmeshpy as mr
-import torch
-from pytorch3d.structures import Meshes
 import pyvista as pv
 import numpy as np
 from meshlib import mrmeshnumpy as mn
-import time
 from scipy.spatial import cKDTree
+import argparse
+
+
+def main(arguments):
+    robot_mesh_pv = pv.read(arguments.robot_mesh)
+    terrain_mesh_pv = pv.read(arguments.terrain_mesh)
+
+    intersection_vertices, intersection_faces = compute_intersection(arguments.robot_mesh, arguments.terrain_mesh)
+    intersection_mesh_pv = get_py_vista_mesh(intersection_vertices, intersection_faces)
+    terrain_touch_cells, terrain_touch_cells_normals = find_touch_points_and_normals(intersection_mesh_pv, terrain_mesh_pv)
+
+    visualize(robot_mesh_pv, terrain_mesh_pv, intersection_mesh_pv, intersection_mesh_pv.cell_centers().points, terrain_touch_cells, terrain_touch_cells_normals)
 
 
 def compute_intersection(path_to_robot_mesh, path_to_terrain_mesh):
@@ -18,28 +27,34 @@ def compute_intersection(path_to_robot_mesh, path_to_terrain_mesh):
     faces = mn.getNumpyFaces(intersection_mesh.topology)
     return vertices, faces
 
+
 def find_touch_points_and_normals(intersection_mesh_pv, terrain_mesh_pv):
     intersection_cells = intersection_mesh_pv.cell_centers().points
     terrain_cells = terrain_mesh_pv.cell_centers().points
     nearest_cells, nearest_cells_indices = find_nearest_neighbors(intersection_cells, terrain_cells)
-    terrain_mesh_pv.flip_normals()
+    terrain_mesh_pv.compute_normals(cell_normals=True, point_normals=False)
     nearest_cells_normals = terrain_mesh_pv.cell_normals[nearest_cells_indices]
-    return nearest_cells, nearest_cells_normals
+    positive_nearest_cells_normals = flip_negative_normals(nearest_cells_normals)
+    return nearest_cells, positive_nearest_cells_normals
+
+
+def find_nearest_neighbors(robot_cells, terrain_cells):
+    kd_tree = cKDTree(terrain_cells)
+    distances, indices = kd_tree.query(robot_cells)
+    nearest_points = terrain_cells[indices]
+    return nearest_points, indices
+
+
+def flip_negative_normals(normals):
+    flip_indices = np.where(normals[:, 2] < 0)[0]
+    normals[flip_indices] *= -1
+    return normals
+
 
 def get_py_vista_mesh(vertices, faces):
     faces_with_size = np.hstack([np.full((faces.shape[0], 1), 3), faces]).flatten()
     mesh = pv.PolyData(vertices, faces_with_size)
     return mesh
-
-
-def find_nearest_neighbors(robot_cells, terrain_cells):
-    kd_tree = cKDTree(terrain_cells)
-    start = time.time()
-    distances, indices = kd_tree.query(robot_cells)
-    end = time.time()
-    print(f"finding nearest points: {(end - start) * 1000} milliseconds")
-    nearest_points = terrain_cells[indices]
-    return nearest_points, indices
 
 
 def visualize(robot_mesh, terrain_mesh, intersection_mesh, robot_cells, nearest_terrain_cells, terrain_normals):
@@ -52,19 +67,8 @@ def visualize(robot_mesh, terrain_mesh, intersection_mesh, robot_cells, nearest_
     plotter.show()
 
 
-def main():
-    path_to_robot_mesh = "/home/robert/catkin_ws/src/robot_touch_point_detection/robot_models/husky_transformed_45_angle/transformed_model_simplified2.obj"
-    path_to_terrain_mesh = "/home/robert/catkin_ws/src/robot_touch_point_detection/terrain_models/terrain_1/terrain_mesh_2.obj"
-
-    robot_mesh_pv = pv.read(path_to_robot_mesh)
-    terrain_mesh_pv = pv.read(path_to_terrain_mesh)
-
-    intersection_vertices, intersection_faces = compute_intersection(path_to_robot_mesh, path_to_terrain_mesh)
-    intersection_mesh_pv = get_py_vista_mesh(intersection_vertices, intersection_faces)
-    terrain_touch_cells, terrain_touch_cells_normals = find_touch_points_and_normals(intersection_mesh_pv, terrain_mesh_pv)
-
-    visualize(robot_mesh_pv, terrain_mesh_pv, intersection_mesh_pv, intersection_mesh_pv.cell_centers().points, terrain_touch_cells, terrain_touch_cells_normals)
-
-
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--robot_mesh", default='', type=str)
+    parser.add_argument("--terrain_mesh", default='', type=str)
+    main(parser.parse_args())
