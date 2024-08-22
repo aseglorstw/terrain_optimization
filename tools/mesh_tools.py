@@ -75,6 +75,15 @@ def generate_terrain_mesh_and_save(output_path):
     # Save the combined mesh to the specified file path
     combined_mesh.save(output_path)
 
+def transform_mesh(path_to_mesh, translation, rotation):
+    mesh = pv.read(path_to_mesh)
+    center = mesh.center
+    mesh.translate(-np.array(center), inplace=True)
+    mesh.rotate_x(rotation[0], inplace=True)
+    mesh.rotate_y(rotation[1], inplace=True)
+    mesh.rotate_z(rotation[2], inplace=True)
+    mesh.translate(translation, inplace=True)
+    return mesh
 
 def save_mesh(mesh, path_to_file):
     vertices = mesh.verts_packed().detach().cpu().numpy()

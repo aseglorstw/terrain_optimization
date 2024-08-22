@@ -6,48 +6,38 @@ import numpy as np
 from meshlib import mrmeshnumpy as mn
 import time
 from scipy.spatial import cKDTree
-from tools import mesh_tools
-from tools import visualize_tools
 
 
-def get_touch_points_meshlib_insideA_or_outsideB(path_to_robot_mesh, path_to_terrain_mesh):
-    robot_mesh = mr.loadMesh(path_to_robot_mesh)
-    terrain_mesh = mr.loadMesh(path_to_terrain_mesh)
-    first_normal = terrain_mesh.normal(mr.FaceId())
+def compute_intersection(path_to_robot_mesh, path_to_terrain_mesh):
+    robot_mesh_mr = mr.loadMesh(path_to_robot_mesh)
+    terrain_mesh_mr = mr.loadMesh(path_to_terrain_mesh)
+    first_normal = terrain_mesh_mr.normal(mr.FaceId())
     boolean_operation = mr.BooleanOperation.OutsideA if first_normal.z < 0 else mr.BooleanOperation.InsideA
-    start = time.time()
-    boolean_result = mr.boolean(robot_mesh, terrain_mesh, boolean_operation)
-    mesh = boolean_result.mesh
-    vertices = mn.getNumpyVerts(mesh)
-    faces = mn.getNumpyFaces(mesh.topology)
-    vertices_tensor = torch.tensor(vertices, dtype=torch.float32)
-    faces_tensor = torch.tensor(faces, dtype=torch.int64)
-    mesh = Meshes(verts=[vertices_tensor], faces=[faces_tensor])
-    end = time.time()
-    print(f"meshlib insideA: {(end - start) * 1000}  milliseconds")
+    intersection_mesh = mr.boolean(robot_mesh_mr, terrain_mesh_mr, boolean_operation).mesh
+    vertices = mn.getNumpyVerts(intersection_mesh)
+    faces = mn.getNumpyFaces(intersection_mesh.topology)
+    return vertices, faces
 
-    faces_with_size = np.hstack([np.full((faces.shape[0], 1), 3), faces]).flatten()
-    intersection_mesh = pv.PolyData(vertices, faces_with_size)
-    intersection_mesh_pv = intersection_mesh.compute_normals(flip_normals=True)
-
-    robot_mesh_pv = pv.read(path_to_robot_mesh)
-    terrain_mesh_pv = pv.read(path_to_terrain_mesh)
-
-    robot_cells = intersection_mesh_pv.cell_centers().points
+def find_touch_points_and_normals(intersection_mesh_pv, terrain_mesh_pv):
+    intersection_cells = intersection_mesh_pv.cell_centers().points
     terrain_cells = terrain_mesh_pv.cell_centers().points
-
-    nearest_points, nearest_indices = find_nearest_neighbors(robot_cells, terrain_cells)
+    nearest_cells, nearest_cells_indices = find_nearest_neighbors(intersection_cells, terrain_cells)
     terrain_mesh_pv.flip_normals()
-    nearest_normals = terrain_mesh_pv.cell_normals[nearest_indices]
+    nearest_cells_normals = terrain_mesh_pv.cell_normals[nearest_cells_indices]
+    return nearest_cells, nearest_cells_normals
 
-    visualize(robot_mesh_pv, terrain_mesh_pv, intersection_mesh_pv, robot_cells, nearest_points, nearest_normals)
+def get_py_vista_mesh(vertices, faces):
+    faces_with_size = np.hstack([np.full((faces.shape[0], 1), 3), faces]).flatten()
+    mesh = pv.PolyData(vertices, faces_with_size)
+    return mesh
+
 
 def find_nearest_neighbors(robot_cells, terrain_cells):
     kd_tree = cKDTree(terrain_cells)
     start = time.time()
     distances, indices = kd_tree.query(robot_cells)
     end = time.time()
-    print(f"finding nearest points: {end - start}")
+    print(f"finding nearest points: {(end - start) * 1000} milliseconds")
     nearest_points = terrain_cells[indices]
     return nearest_points, indices
 
@@ -62,14 +52,19 @@ def visualize(robot_mesh, terrain_mesh, intersection_mesh, robot_cells, nearest_
     plotter.show()
 
 
-
-
 def main():
     path_to_robot_mesh = "/home/robert/catkin_ws/src/robot_touch_point_detection/robot_models/husky_transformed_45_angle/transformed_model_simplified2.obj"
     path_to_terrain_mesh = "/home/robert/catkin_ws/src/robot_touch_point_detection/terrain_models/terrain_1/terrain_mesh_2.obj"
-    get_touch_points_meshlib_insideA_or_outsideB(path_to_robot_mesh, path_to_terrain_mesh)
-    # mesh_tools.generate_terrain_mesh_and_save("/home/robert/catkin_ws/src/robot_touch_point_detection/terrain_models/terrain_1/terrain_mesh_2.obj")
-    # visualize_tools.visualize_two_meshes(path_to_robot_mesh, path_to_terrain_mesh)
+
+    robot_mesh_pv = pv.read(path_to_robot_mesh)
+    terrain_mesh_pv = pv.read(path_to_terrain_mesh)
+
+    intersection_vertices, intersection_faces = compute_intersection(path_to_robot_mesh, path_to_terrain_mesh)
+    intersection_mesh_pv = get_py_vista_mesh(intersection_vertices, intersection_faces)
+    terrain_touch_cells, terrain_touch_cells_normals = find_touch_points_and_normals(intersection_mesh_pv, terrain_mesh_pv)
+
+    visualize(robot_mesh_pv, terrain_mesh_pv, intersection_mesh_pv, intersection_mesh_pv.cell_centers().points, terrain_touch_cells, terrain_touch_cells_normals)
+
 
 if __name__ == '__main__':
     main()
