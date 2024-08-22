@@ -6,6 +6,8 @@ import numpy as np
 from meshlib import mrmeshnumpy as mn
 import time
 from scipy.spatial import cKDTree
+from tools import mesh_tools
+from tools import visualize_tools
 
 
 def get_touch_points_meshlib_insideA_or_outsideB(path_to_robot_mesh, path_to_terrain_mesh):
@@ -64,9 +66,10 @@ def visualize(robot_mesh, terrain_mesh, intersection_mesh, robot_cells, nearest_
 
 def main():
     path_to_robot_mesh = "/home/robert/catkin_ws/src/robot_touch_point_detection/robot_models/husky_transformed_45_angle/transformed_model_simplified2.obj"
-    path_to_terrain_mesh = "/home/robert/catkin_ws/src/robot_touch_point_detection/terrain_models/terrain_1/terrain_mesh.obj"
+    path_to_terrain_mesh = "/home/robert/catkin_ws/src/robot_touch_point_detection/terrain_models/terrain_1/terrain_mesh_2.obj"
     get_touch_points_meshlib_insideA_or_outsideB(path_to_robot_mesh, path_to_terrain_mesh)
-
+    # mesh_tools.generate_terrain_mesh_and_save("/home/robert/catkin_ws/src/robot_touch_point_detection/terrain_models/terrain_1/terrain_mesh_2.obj")
+    # visualize_tools.visualize_two_meshes(path_to_robot_mesh, path_to_terrain_mesh)
 
 if __name__ == '__main__':
     main()

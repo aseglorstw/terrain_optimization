@@ -38,14 +38,14 @@ def simplify_mesh(input_file, output_path, reduction):
 
 def generate_terrain_mesh_and_save(output_path):
     # Generate grid points
-    nx, ny = 100, 100
+    nx, ny = 150, 150
     x = np.linspace(20, 30, nx)
     y = np.linspace(20, 30, ny)
     x, y = np.meshgrid(x, y)
 
     # Define terrain heights (clamp to z >= 0)
     z = np.sin(x) * np.cos(y)
-    z[z < 0] = 0  # Ensure z-values are non-negative (clamping)
+    # z[z < 0] = 0  # Ensure z-values are non-negative (clamping)
 
     # Create the structured grid with clamped heights
     grid = pv.StructuredGrid(x, y, z)
@@ -74,7 +74,6 @@ def generate_terrain_mesh_and_save(output_path):
     combined_mesh.point_data["Normals"] = normals
     # Save the combined mesh to the specified file path
     combined_mesh.save(output_path)
-
 
 
 def save_mesh(mesh, path_to_file):
