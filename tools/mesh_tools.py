@@ -5,6 +5,7 @@ from pytorch3d.io import load_obj, save_obj
 from pytorch3d.structures import Meshes
 from tools import device_tools
 import fast_simplification
+import vtk
 
 
 def load_mesh(path_to_obj_file, device):
@@ -18,11 +19,21 @@ def move_mesh_to_VRAM(vertices, faces, device):
     return vertices.to(device), faces.verts_idx.to(device)
 
 
-def simplify_mesh_and_save(path_to_mesh, output_path, reduction):
-    mesh = pv.read(path_to_mesh)
-    # simplified_mesh = mesh.decimate_pro(reduction)
-    simplified_mesh = fast_simplification.simplify_mesh(mesh, target_reduction=reduction)
-    simplified_mesh.save(output_path)
+def simplify_mesh(input_file, output_path, reduction):
+    reader = vtk.vtkOBJReader()
+    reader.SetFileName(input_file)
+    reader.Update()
+    mesh = reader.GetOutput()
+    decimator = vtk.vtkQuadricDecimation()
+    decimator.SetInputData(mesh)
+    decimator.SetTargetReduction(reduction)
+    decimator.Update()
+    simplified_mesh = decimator.GetOutput()
+    writer = vtk.vtkOBJWriter()
+    writer.SetFileName(output_path)
+    writer.SetInputData(simplified_mesh)
+    writer.Write()
+    return simplified_mesh
 
 
 def generate_terrain_mesh_and_save(output_path):
