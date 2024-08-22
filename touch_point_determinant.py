@@ -12,6 +12,7 @@ def main(arguments):
 
     intersection_vertices, intersection_faces = compute_intersection(arguments.robot_mesh, arguments.terrain_mesh)
     intersection_mesh_pv = get_py_vista_mesh(intersection_vertices, intersection_faces)
+
     terrain_touch_cells, terrain_touch_cells_normals = find_touch_points_and_normals(intersection_mesh_pv, terrain_mesh_pv)
 
     visualize(robot_mesh_pv, terrain_mesh_pv, intersection_mesh_pv, intersection_mesh_pv.cell_centers().points, terrain_touch_cells, terrain_touch_cells_normals)
