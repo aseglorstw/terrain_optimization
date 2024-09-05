@@ -2,19 +2,15 @@ import meshlib.mrmeshpy as mr
 import pyvista as pv
 import numpy as np
 from meshlib import mrmeshnumpy as mn
-from networkx.classes.filters import show_edges
-from pyvista import Plotter
 from scipy.spatial import cKDTree
 import argparse
-
-import time
 
 
 def main(arguments):
     robot_mesh_pv = pv.read(arguments.robot_mesh)
     terrain_mesh_pv = pv.read(arguments.terrain_mesh)
 
-    process_boolean_intersection(arguments, robot_mesh_pv, terrain_mesh_pv)
+    terrain_touch_cells, terrain_touch_cells_normals = process_boolean_intersection(arguments, robot_mesh_pv, terrain_mesh_pv)
 
 
 def process_boolean_intersection(arguments, robot_mesh_pv, terrain_mesh_pv):
@@ -24,6 +20,8 @@ def process_boolean_intersection(arguments, robot_mesh_pv, terrain_mesh_pv):
     terrain_touch_cells, terrain_touch_cells_normals = find_touch_points_and_normals(intersection_mesh_pv, terrain_mesh_pv)
 
     visualize_boolean_intersection(robot_mesh_pv, terrain_mesh_pv, intersection_mesh_pv, intersection_mesh_pv.cell_centers().points, terrain_touch_cells, terrain_touch_cells_normals)
+
+    return terrain_touch_cells, terrain_touch_cells_normals
 
 
 def compute_boolean_intersection(path_to_robot_mesh, path_to_terrain_mesh):
