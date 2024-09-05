@@ -2,28 +2,36 @@ import meshlib.mrmeshpy as mr
 import pyvista as pv
 import numpy as np
 from meshlib import mrmeshnumpy as mn
+from networkx.classes.filters import show_edges
+from pyvista import Plotter
 from scipy.spatial import cKDTree
 import argparse
+
+import time
 
 
 def main(arguments):
     robot_mesh_pv = pv.read(arguments.robot_mesh)
     terrain_mesh_pv = pv.read(arguments.terrain_mesh)
 
-    intersection_vertices, intersection_faces = compute_intersection(arguments.robot_mesh, arguments.terrain_mesh)
+    process_boolean_intersection(arguments, robot_mesh_pv, terrain_mesh_pv)
+
+
+def process_boolean_intersection(arguments, robot_mesh_pv, terrain_mesh_pv):
+    intersection_vertices, intersection_faces = compute_boolean_intersection(arguments.robot_mesh, arguments.terrain_mesh)
     intersection_mesh_pv = get_py_vista_mesh(intersection_vertices, intersection_faces)
 
     terrain_touch_cells, terrain_touch_cells_normals = find_touch_points_and_normals(intersection_mesh_pv, terrain_mesh_pv)
 
-    visualize(robot_mesh_pv, terrain_mesh_pv, intersection_mesh_pv, intersection_mesh_pv.cell_centers().points, terrain_touch_cells, terrain_touch_cells_normals)
+    visualize_boolean_intersection(robot_mesh_pv, terrain_mesh_pv, intersection_mesh_pv, intersection_mesh_pv.cell_centers().points, terrain_touch_cells, terrain_touch_cells_normals)
 
 
-def compute_intersection(path_to_robot_mesh, path_to_terrain_mesh):
-    robot_mesh_mr = mr.loadMesh(path_to_robot_mesh)
-    terrain_mesh_mr = mr.loadMesh(path_to_terrain_mesh)
-    first_normal = terrain_mesh_mr.normal(mr.FaceId())
+def compute_boolean_intersection(path_to_robot_mesh, path_to_terrain_mesh):
+    robot_mesh = mr.loadMesh(path_to_robot_mesh)
+    terrain_mesh = mr.loadMesh(path_to_terrain_mesh)
+    first_normal = terrain_mesh.normal(mr.FaceId())
     boolean_operation = mr.BooleanOperation.OutsideA if first_normal.z < 0 else mr.BooleanOperation.InsideA
-    intersection_mesh = mr.boolean(robot_mesh_mr, terrain_mesh_mr, boolean_operation).mesh
+    intersection_mesh = mr.boolean(robot_mesh, terrain_mesh, boolean_operation).mesh
     vertices = mn.getNumpyVerts(intersection_mesh)
     faces = mn.getNumpyFaces(intersection_mesh.topology)
     return vertices, faces
@@ -58,7 +66,7 @@ def get_py_vista_mesh(vertices, faces):
     return mesh
 
 
-def visualize(robot_mesh, terrain_mesh, intersection_mesh, robot_cells, nearest_terrain_cells, terrain_normals):
+def visualize_boolean_intersection(robot_mesh, terrain_mesh, intersection_mesh, robot_cells, nearest_terrain_cells, terrain_normals):
     plotter = pv.Plotter()
     plotter.add_mesh(robot_mesh, style='wireframe', color='yellow')
     plotter.add_mesh(terrain_mesh, style='wireframe', color='purple')
